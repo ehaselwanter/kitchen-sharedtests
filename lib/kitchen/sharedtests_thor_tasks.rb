@@ -83,8 +83,9 @@ module Kitchen
       
       if File.directory?(repo_path)
         Kitchen.logger.info("updating #{repo_path} ")
-        local_repo = Git.open(repo_path, :log => Kitchen.logger)
-        if local_repo.status.pretty.empty? # there must be a better way
+        
+        local_repo = Git.open(repo_path)
+
         # there must be a better way
         if local_repo.status.changed.empty? && local_repo.status.added.empty? \
           && local_repo.status.deleted.empty? && local_repo.status.untracked.empty?
