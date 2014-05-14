@@ -75,9 +75,12 @@ module Kitchen
       end
     end
 
-    def create_or_update_test_repo(test_repo_uri,name,path)
+    def create_or_update_test_repo(test_repo_uri, name, path)
+
       Kitchen.logger.info("-----> create or update #{test_repo_uri}")
-      repo_path = File.join(Dir.pwd,name)
+      
+      repo_path = File.join(path,name)
+      
       if File.directory?(repo_path)
         Kitchen.logger.info("updating #{repo_path} ")
         local_repo = Git.open(repo_path, :log => Kitchen.logger)
