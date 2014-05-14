@@ -48,7 +48,7 @@ module Kitchen
       config.instances.each do |instance|
         self.class.desc instance.name, "Run #{instance.name} test instance"
         self.class.send(:define_method, instance.name.gsub(/-/, '_')) do
-          create_or_update_test_repo(instance.provisioner[:test_repo_uri], Kitchen::Sharedtests::TEST_REPO_NAME, :path => Dir.pwd)
+          create_or_update_test_repo(instance.provisioner[:test_repo_uri], Kitchen::Sharedtests::TEST_REPO_NAME, config.kitchen_root)
           instance.test(:always)
         end
       end
@@ -57,7 +57,7 @@ module Kitchen
         command = "verify-#{instance.name}"
         self.class.desc command, "Run #{command} to verify instance"
         self.class.send(:define_method, command.gsub(/-/, '_')) do
-          create_or_update_test_repo(instance.provisioner[:test_repo_uri], Kitchen::Sharedtests::TEST_REPO_NAME, :path => Dir.pwd)
+          create_or_update_test_repo(instance.provisioner[:test_repo_uri], Kitchen::Sharedtests::TEST_REPO_NAME, config.kitchen_root)
           instance.verify
         end
       end
