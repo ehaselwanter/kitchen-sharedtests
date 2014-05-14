@@ -17,8 +17,8 @@
 # limitations under the License.
 
 require 'thor'
-
 require 'kitchen'
+require 'git'
 
 module Kitchen
 
@@ -34,7 +34,7 @@ module Kitchen
     # @yield [self] gives itself to the block
     def initialize(*args)
       super
-      @config = Kitchen::Config.new :test_base_path => ::TEST_BASE_PATH 
+      @config = Kitchen::Config.new :test_base_path => Kitchen::Sharedtests::TEST_BASE_PATH 
       Kitchen.logger = Kitchen.default_file_logger
       yield self if block_given?
       define
@@ -48,7 +48,7 @@ module Kitchen
       config.instances.each do |instance|
         self.class.desc instance.name, "Run #{instance.name} test instance"
         self.class.send(:define_method, instance.name.gsub(/-/, '_')) do
-          create_or_update_test_repo("https://github.com/ehaselwanter/tests-kitchen-example.git", "shared_test_repo", :path => Dir.pwd)
+          create_or_update_test_repo(instance.provisioner[:test_repo_uri], Kitchen::Sharedtests::TEST_REPO_NAME, :path => Dir.pwd)
           instance.test(:always)
         end
       end
@@ -57,7 +57,7 @@ module Kitchen
         command = "verify-#{instance.name}"
         self.class.desc command, "Run #{command} to verify instance"
         self.class.send(:define_method, command.gsub(/-/, '_')) do
-          create_or_update_test_repo("https://github.com/ehaselwanter/tests-kitchen-example.git", "shared_test_repo", :path => Dir.pwd)
+          create_or_update_test_repo(instance.provisioner[:test_repo_uri], Kitchen::Sharedtests::TEST_REPO_NAME, :path => Dir.pwd)
           instance.verify
         end
       end
@@ -75,15 +75,20 @@ module Kitchen
       end
     end
 
-    def create_or_update_test_repo(repo_url,name,path)
+    def create_or_update_test_repo(test_repo_uri,name,path)
+      Kitchen.logger.info("-----> create or update #{test_repo_uri}")
       repo_path = File.join(Dir.pwd,name)
       if File.directory?(repo_path)
         Kitchen.logger.info("updating #{repo_path} ")
         local_repo = Git.open(repo_path, :log => Kitchen.logger)
-        local_repo.pull
+        if local_repo.status.pretty.empty? # there must be a better way
+          local_repo.pull
+        else
+          Kitchen.logger.info("repo not clean, not pulling from #{test_repo_uri}")  
+        end
       else 
-        Kitchen.logger.info("cloning repo_path ")
-        ::Git.clone(repo_url, "shared_test_repo", :path => Dir.pwd, :log => Kitchen.logger)
+        Kitchen.logger.info("cloning #{test_repo_uri} repo_path ")
+        ::Git.clone(test_repo_uri, "shared_test_repo", :path => Dir.pwd, :log => Kitchen.logger)
       end
     end
 
