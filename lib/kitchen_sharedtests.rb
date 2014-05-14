@@ -1,0 +1,1 @@
+require 'kitchen/sharedtests/version'
