@@ -8,7 +8,7 @@ This gem allows you to use an external git repo for your tests. This comes in ha
 
 Add this line to your application's Gemfile:
 
-    gem 'kitchen-shared-tests'
+    gem 'kitchen-sharedtests'
 
 And then execute:
 
@@ -16,7 +16,7 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install kitchen-shared-tests
+    $ gem install kitchen-sharedtests
 
 ## Usage
 
@@ -38,6 +38,43 @@ Add a new option to your `kitchen.yml` pointing to the integration test repo
 ```
 provisioner:
   test_repo_uri: "https://github.com/ehaselwanter/tests-kitchen-example.git"
+```
+
+Then you can either overwrite your local integration folder or run from a new integration test folder.
+
+```
+thor kitchen:fetch-remote-tests
+
+± kitchen diagnose |grep test_base_path
+        test_base_path: /....../puppet-kitchen-example/test/integration
+        test_base_path: /....../puppet-kitchen-example/test/integration
+        test_base_path: /....../puppet-kitchen-example/test/integration
+```
+
+will clone the in the `provisioner.test_repo_uri` to `test/integration`
+
+```
+thor kitchen:all-sharedtests 
+```
+
+and the other `kitchen:*-sharedtests*` tasks will create a folder `./shared_test_repo` and point `test_base_path` to this folder
+
+```
+± thor kitchen:diagnose-sharedtests-default-ubuntu-1204|grep test_base_path
+    !ruby/sym test_base_path: /....../puppet-kitchen-example/shared_test_repo
+    !ruby/sym test_base_path: /....../puppet-kitchen-example/shared_test_repo
+    !ruby/sym test_base_path: /....../puppet-kitchen-example/shared_test_repo
+```    
+
+```
+± thor -T
+kitchen
+-------
+thor kitchen:all-sharedtests                           # Run all test instances
+thor kitchen:diagnose-sharedtests-default-ubuntu-1204  # Diagnose default-ubuntu-1204 test instance
+thor kitchen:fetch-remote-tests                        # Fetch remote tests from provider.test_repo_uri
+thor kitchen:run-sharedtests-default-ubuntu-1204       # Run run-sharedtests-default-ubuntu-1204 test instance
+thor kitchen:verify-sharedtests-default-ubuntu-1204    # Run default-ubuntu-1204 to verify instance
 ```
 
 ## Contributing
