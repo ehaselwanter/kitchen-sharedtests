@@ -73,6 +73,11 @@ module Kitchen
           puts instance.diagnose
         end
       end
+
+      self.class.desc "fetch-remote-tests", "Fetch remote tests from provider.test_repo_uri"
+      self.class.send(:define_method, "fetch_remote_tests") do
+        create_or_update_test_repo(config.instances.first.provisioner[:test_repo_uri], "test", config.kitchen_root)
+      end
     end
 
     def create_or_update_test_repo(test_repo_uri, name, path)
@@ -94,8 +99,8 @@ module Kitchen
           Kitchen.logger.info("repo not clean, not pulling from #{test_repo_uri}")  
         end
       else 
-        Kitchen.logger.info("cloning #{test_repo_uri} repo_path ")
-        ::Git.clone(test_repo_uri, "shared_test_repo", :path => Dir.pwd, :log => Kitchen.logger)
+        Kitchen.logger.info("cloning #{test_repo_uri} #{repo_path} ")
+        ::Git.clone(test_repo_uri, name, :path => path, :log => Kitchen.logger)
       end
     end
 
