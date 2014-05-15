@@ -46,31 +46,33 @@ module Kitchen
 
     def define
       config.instances.each do |instance|
-        self.class.desc instance.name, "Run #{instance.name} test instance"
-        self.class.send(:define_method, instance.name.gsub(/-/, '_')) do
+        command = "run-sharedtests-#{instance.name}"
+        self.class.desc command, "Run #{command} test instance"
+        self.class.send(:define_method, command.gsub(/-/, '_')) do
           create_or_update_test_repo(instance.provisioner[:test_repo_uri], Kitchen::Sharedtests::TEST_REPO_NAME, config.kitchen_root)
           instance.test(:always)
         end
       end
 
       config.instances.each do |instance|
-        command = "verify-#{instance.name}"
-        self.class.desc command, "Run #{command} to verify instance"
+        command = "verify-sharedtests-#{instance.name}"
+        self.class.desc command, "Run #{instance.name} to verify instance"
         self.class.send(:define_method, command.gsub(/-/, '_')) do
           create_or_update_test_repo(instance.provisioner[:test_repo_uri], Kitchen::Sharedtests::TEST_REPO_NAME, config.kitchen_root)
           instance.verify
         end
       end
 
-      self.class.desc "all", "Run all test instances"
-      self.class.send(:define_method, :all) do
+      self.class.desc "all-sharedtests", "Run all test instances"
+      self.class.send(:define_method, :all_sharedtests) do
         config.instances.each { |i| invoke i.name.gsub(/-/, '_') }
       end
 
       config.instances.each do |instance|
-        self.class.desc "diagnose-#{instance.name}", "Diagnose #{instance.name} test instance"
-        self.class.send(:define_method, "diagnose_#{instance.name.gsub(/-/, '_')}") do
-          puts instance.diagnose
+        command = "diagnose-sharedtests-#{instance.name}"
+        self.class.desc command, "Diagnose #{instance.name} test instance"
+        self.class.send(:define_method, command.gsub(/-/, '_')) do
+          puts instance.diagnose.to_yaml
         end
       end
 
