@@ -78,7 +78,9 @@ module Kitchen
 
       self.class.desc "fetch-remote-tests", "Fetch remote tests from provider.test_repo_uri"
       self.class.send(:define_method, "fetch_remote_tests") do
-        create_or_update_test_repo(config.instances.first.provisioner[:test_repo_uri], "test", config.kitchen_root)
+        test_root = File.join(config.kitchen_root,'test')
+        Dir.mkdir(test_root) unless File.directory?(test_root)
+        create_or_update_test_repo(config.instances.first.provisioner[:test_repo_uri], "integration", test_root)
       end
     end
 
