@@ -1,8 +1,10 @@
 # -*- encoding: utf-8 -*-
 #
 # Author:: Fletcher Nichol (<fnichol@nichol.ca>)
+# Author:: Edmund Haselwanter (<me@ehaselwanter.com>)
 #
 # Copyright (C) 2012, Fletcher Nichol
+# Copyright (C) 2014, Edmund Haselwanter
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
